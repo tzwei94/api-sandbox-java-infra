@@ -1,5 +1,5 @@
 variable "app_repository" {
-  default = "banking-api"
+  default = "api-sandbox-java"
 }
 
 variable "aws_db_instance_database" {
@@ -22,7 +22,7 @@ variable "bootstrap_enabled" {
 }
 
 variable "deployment_repository" {
-  default = "banking-infrastructure"
+  default = "api-sandbox-java-infra"
 }
 
 variable "github_environment" {

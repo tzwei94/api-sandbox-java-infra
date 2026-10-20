@@ -19,7 +19,7 @@ variable "alloy_image" {
 }
 
 variable "app_repository" {
-  default = "banking-api"
+  default = "api-sandbox-java"
 }
 
 variable "bootstrap_enabled" {
@@ -59,7 +59,7 @@ variable "memory_autoscaling_enabled" {
 }
 
 variable "deployment_repository" {
-  default = "banking-infrastructure"
+  default = "api-sandbox-java-infra"
 }
 
 variable "final_snapshot_identifier" {

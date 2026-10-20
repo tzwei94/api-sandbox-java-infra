@@ -207,22 +207,22 @@ run "backup_retention_can_use_one_day" {
 run "immutable_github_subjects_keep_context_restrictions" {
   command = plan
   variables {
-    github_app_subject_prefix        = "repo:example@123/banking-api@456"
-    github_deployment_subject_prefix = "repo:example@123/banking-infrastructure@789"
+    github_app_subject_prefix        = "repo:example@123/api-sandbox-java@456"
+    github_deployment_subject_prefix = "repo:example@123/api-sandbox-java-infra@789"
   }
   assert {
-    condition     = jsondecode(module.iam.aws_iam_role_build.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example@123/banking-api@456:ref:refs/heads/main"
+    condition     = jsondecode(module.iam.aws_iam_role_build.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example@123/api-sandbox-java@456:ref:refs/heads/main"
     error_message = "Immutable build subjects must remain restricted to main."
   }
   assert {
-    condition     = jsondecode(module.iam.aws_iam_role_deploy.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example@123/banking-infrastructure@789:environment:dev"
+    condition     = jsondecode(module.iam.aws_iam_role_deploy.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example@123/api-sandbox-java-infra@789:environment:dev"
     error_message = "Immutable deploy subjects must remain restricted to dev."
   }
 }
 run "legacy_github_subjects_remain_supported" {
   command = plan
   assert {
-    condition     = jsondecode(module.iam.aws_iam_role_build.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example/banking-api:ref:refs/heads/main"
+    condition     = jsondecode(module.iam.aws_iam_role_build.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example/api-sandbox-java:ref:refs/heads/main"
     error_message = "Legacy repositories must keep their exact name-based subject."
   }
 }
@@ -237,7 +237,7 @@ run "alloy_publisher_can_push_only_alloy_from_deployment_main" {
     error_message = "Alloy publishing must have ECR push access only to the Alloy repository."
   }
   assert {
-    condition     = jsondecode(module.iam.aws_iam_role_alloy_publish.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example/banking-infrastructure:ref:refs/heads/main"
+    condition     = jsondecode(module.iam.aws_iam_role_alloy_publish.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example/api-sandbox-java-infra:ref:refs/heads/main"
     error_message = "Alloy publishing must trust only deployment main, not PRs or other branches."
   }
   assert {
@@ -248,9 +248,9 @@ run "alloy_publisher_can_push_only_alloy_from_deployment_main" {
 
 run "alloy_publisher_supports_immutable_repository_subjects" {
   command = plan
-  variables { github_deployment_subject_prefix = "repo:example@123/banking-infrastructure@789" }
+  variables { github_deployment_subject_prefix = "repo:example@123/api-sandbox-java-infra@789" }
   assert {
-    condition     = jsondecode(module.iam.aws_iam_role_alloy_publish.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example@123/banking-infrastructure@789:ref:refs/heads/main"
+    condition     = jsondecode(module.iam.aws_iam_role_alloy_publish.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:example@123/api-sandbox-java-infra@789:ref:refs/heads/main"
     error_message = "Immutable Alloy publishing subjects must retain the main branch restriction."
   }
 }

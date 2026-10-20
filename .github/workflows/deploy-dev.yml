@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       image:
-        description: Tested banking-api repository@sha256 digest
+        description: Tested API Sandbox Java image repository@sha256 digest
         required: true
       alloy_image:
         description: Alloy digest override (blank uses latest successful publish manifest)

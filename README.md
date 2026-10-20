@@ -1,10 +1,12 @@
-# Banking Infrastructure
+# API Sandbox Java Infrastructure
 
 For first-time setup from the main repository, follow the ordered **[AWS setup guide](../SETUP.md)**. This document is the detailed deployment reference. Commands below run from the deployment checkout (`cd deployment` from the parent workspace); the application checkout is its sibling `../app`. The parent setup and budget guides are available in the combined workspace.
 
 Run `uv run deploy/scripts/setup.py` for the interactive preparation menu (macOS prerequisites, AWS profile, certificate/DNS, preflight checks, Terraform roots, secrets, runner repair/registration, GitHub settings and explicit dev teardown). Settings resume from ignored `.private/setup/`; see the parent setup guide for details.
 
 Terraform, GitHub Actions, EC2 runner provisioning and release scripts for the companion banking API. Releases deploy immutable image digests.
+
+Repository naming follows `api-sandbox-java-workspace`, `api-sandbox-java`, and `api-sandbox-java-infra`. Existing AWS resource names, ECR repositories, state locations, runner labels, and JWT identities retain their current values. Before publishing or deploying after a repository rename, update the operator's private repository settings and GitHub `DEV_TFVARS_JSON` repository fields, and review/apply the exact GitHub OIDC trust subjects separately.
 
 Terraform has two bootstrap roots, `infra/bootstrap/backend` and `infra/bootstrap/github-oidc`, reusable modules under `infra/modules`, and one application environment at `infra/environments/dev`. Dev owns networking, IAM, ALB, RDS, ECS, runner, secrets metadata, alarms and task/service resources in one S3 state key, `dev/terraform.tfstate`.
 
@@ -130,7 +132,7 @@ Then dispatch the protected deployment workflow with the tested digest/SHA pair,
 
 Migrations must remain backward compatible with the old application during rollout. For application rollback, dispatch `action=rollback` with `first_release=false`; the workflow still requires valid `image` and `source_sha` inputs and resolves `alloy_image` from the publish manifest unless explicitly supplied. Rollback selects its service target from `prior_active_task_definition_arn` in the manifest, applies the retained prior ARN and updates the manifest after health/smoke checks. It never reverses DB migrations. Circuit-breaker rollback is explicitly reconciled through Terraform. No script calls `ecs update-service` or registers competing task definitions.
 
-For manual post-deployment API checks, use the application's [Postman collection and setup guide](https://github.com/tzwei94/banking-api/tree/main/postman). Import the collection and environment template, set the public HTTPS `base_url`, and set `token_username` / `token_password` and send **Get token** to fill `api_token`. Keep certificate verification enabled. The default banking sequence deposits, retries, and withdraws the same amount on the synthetic account.
+For manual post-deployment API checks, use the application's [Postman collection and setup guide](https://github.com/tzwei94/api-sandbox-java/tree/main/postman). Import the collection and environment template, set the public HTTPS `base_url`, and set `token_username` / `token_password` and send **Get token** to fill `api_token`. Keep certificate verification enabled. The default banking sequence deposits, retries, and withdraws the same amount on the synthetic account.
 
 ## Operations and cleanup
 
